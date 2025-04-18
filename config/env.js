@@ -74,6 +74,11 @@ function getClientEnvironment(publicUrl) {
         // This should only be used as an escape hatch. Normally you would put
         // images into the `src` and `import` them in code to get their paths.
         PUBLIC_URL: publicUrl,
+
+        WDS_SOCKET_HOST: process.env.WDS_SOCKET_HOST, // Note(alichry, 2025): Needed for Webpack Hot Dev Client
+        WDS_SOCKET_PORT: process.env.WDS_SOCKET_PORT, // Note(alichry, 2025): Needed for Webpack Hot Dev Client
+        WDS_SOCKET_PATH: process.env.WDS_SOCKET_PATH, // Note(alichry, 2025): Needed for Webpack Hot Dev Client
+        FAST_REFRESH: process.env.FAST_REFRESH, // Note(alichry, 2025): Needed for Webpack Hot Dev Client
       }
     );
   // Stringify all values so we can feed into Webpack DefinePlugin

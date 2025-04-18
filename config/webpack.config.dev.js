@@ -6,11 +6,12 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
+// const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -26,6 +27,7 @@ const env = getClientEnvironment(publicUrl);
 // It is focused on developer experience and fast rebuilds.
 // The production configuration is different and lives in a separate file.
 module.exports = {
+  mode: 'development',
   // You may want 'eval' instead if you prefer to see the compiled output in DevTools.
   // See the discussion in https://github.com/facebookincubator/create-react-app/issues/343.
   devtool: 'cheap-module-source-map',
@@ -72,6 +74,19 @@ module.exports = {
       path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
   },
   resolve: {
+    fallback: {
+      // Some libraries import Node modules but don't use them in the browser.
+      // Tell Webpack to provide empty mocks for them so importing them works.
+      // Note(alichry, 2025): Specify these libraries under resolve.fallback
+      // instead of under configuration.node
+      dgram: false,
+      fs: false,
+      net: false,
+      tls: false,
+      // url and path required for WebpackDevServer to work:
+      url: require.resolve("url/"),
+      path: require.resolve("path-browserify")
+    },
     // This allows you to set a fallback for where Webpack should look for modules.
     // We placed these paths second because we want `node_modules` to "win"
     // if there are any conflicts. This matches Node resolution mechanism.
@@ -110,19 +125,6 @@ module.exports = {
 
       // First, run the linter.
       // It's important to do this before Babel processes the JS.
-      {
-        test: /\.(js|jsx)$/,
-        enforce: 'pre',
-        use: [
-          {
-            options: {
-              formatter: eslintFormatter,
-            },
-            loader: require.resolve('eslint-loader'),
-          },
-        ],
-        include: paths.appSrc,
-      },
       // ** ADDING/UPDATING LOADERS **
       // The "file" loader handles all assets unless explicitly excluded.
       // The `exclude` list *must* be updated with every change to loader extensions.
@@ -184,6 +186,10 @@ module.exports = {
             loader: require.resolve('css-loader'),
             options: {
               importLoaders: 1,
+              // Note(alichry, 2025): URLs specified in jsconsole.css
+              // are not aligned with the project directory path but rather
+              // to the public/ directory. We disable it to enable compilation
+              url: false,
             },
           },
           {
@@ -191,19 +197,28 @@ module.exports = {
             options: {
               // Necessary for external CSS imports to work
               // https://github.com/facebookincubator/create-react-app/issues/2677
-              ident: 'postcss',
-              plugins: () => [
-                require('postcss-flexbugs-fixes'),
-                autoprefixer({
-                  browsers: [
-                    '>1%',
-                    'last 4 versions',
-                    'Firefox ESR',
-                    'not ie < 9', // React doesn't support IE8 anyway
+              // -
+              // Note(alichry, 2025), seems like it's fixed, see:
+              // https://github.com/facebook/create-react-app/pull/2430
+              // ident: 'postcss',
+              postcssOptions: {
+                plugins: [
+                  [
+                    // Note(alichry, 2025): It seems postcss-flexbugs-fixes
+                    // is no longer necessary.
+                    // require('postcss-flexbugs-fixes'),
+                    autoprefixer({
+                      browsers: [
+                        '>1%',
+                        'last 4 versions',
+                        'Firefox ESR',
+                        'not ie < 9', // React doesn't support IE8 anyway
+                      ],
+                      flexbox: 'no-2009',
+                    }),
                   ],
-                  flexbox: 'no-2009',
-                }),
-              ],
+                ],
+              },
             },
           },
         ],
@@ -212,19 +227,26 @@ module.exports = {
       // Remember to add the new extension(s) to the "file" loader exclusion list.
     ],
   },
+  optimization: {
+    // Add module names to factory functions so they appear in browser profiler.
+    moduleIds: 'named'
+  },
   plugins: [
+    new ESLintPlugin({
+      formatter: eslintFormatter,
+      extensions: ['js', 'jsx'],
+      configType: 'eslintrc'
+    }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     // In development, this will be an empty string.
-    new InterpolateHtmlPlugin(env.raw),
+    new InterpolateHtmlPlugin((HtmlWebpackPlugin), env.raw),
     // Generates an `index.html` file with the <script> injected.
     new HtmlWebpackPlugin({
       inject: true,
       template: paths.appHtml,
     }),
-    // Add module names to factory functions so they appear in browser profiler.
-    new webpack.NamedModulesPlugin(),
     // Makes some environment variables available to the JS code, for example:
     // if (process.env.NODE_ENV === 'development') { ... }. See `./env.js`.
     new webpack.DefinePlugin(env.stringified),
@@ -233,27 +255,27 @@ module.exports = {
     // Watcher doesn't work well if you mistype casing in a path so we use
     // a plugin that prints an error when you attempt to do this.
     // See https://github.com/facebookincubator/create-react-app/issues/240
-    new CaseSensitivePathsPlugin(),
+    //new CaseSensitivePathsPlugin(),
     // If you require a missing module and then `npm install` it, you still have
     // to restart the development server for Webpack to discover it. This plugin
     // makes the discovery automatic so you don't have to restart.
     // See https://github.com/facebookincubator/create-react-app/issues/186
-    new WatchMissingNodeModulesPlugin(paths.appNodeModules),
+    // -
+    // Note(alichry, 2025): This plugin has been removed
+    //new WatchMissingNodeModulesPlugin(paths.appNodeModules),
     // Moment.js is an extremely popular library that bundles large locale files
     // by default due to how Webpack interprets its code. This is a practical
     // solution that requires the user to opt into importing specific locales.
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // -
+    // Note(alichry, 2025): See webpack's documentaton on the IgnorePlugin
+    // example to optimise moment.js: https://webpack.js.org/plugins/ignore-plugin/
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/,
+    }),
   ],
-  // Some libraries import Node modules but don't use them in the browser.
-  // Tell Webpack to provide empty mocks for them so importing them works.
-  node: {
-    dgram: 'empty',
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty',
-  },
   // Turn off performance hints during development because we don't do any
   // splitting or minification in interest of speed. These warnings become
   // cumbersome.
