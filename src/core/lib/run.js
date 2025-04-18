@@ -20,6 +20,9 @@ export const bindConsole = __console => {
   ];
 
   apply.forEach(method => {
+    if (container.contentWindow === window) {
+      return;
+    }
     container.contentWindow.console[method] = (...args) => {
       window.console[method].apply(window.console, args);
       __console[method].apply(__console, args);
@@ -30,13 +33,15 @@ export const bindConsole = __console => {
 export const getContainer = () => container;
 
 export function createContainer() {
-  container = document.createElement('iframe');
+  container = document.createElement('div');
   container.width = container.height = 1;
   container.style.opacity = 0;
   container.style.border = 0;
   container.style.position = 'absolute';
   container.style.top = '-100px';
   container.setAttribute('name', '<proxy>');
+  container.contentWindow = window;
+  container.contentDocument = window.document;
   document.body.appendChild(container);
   setContainer(container);
 }
