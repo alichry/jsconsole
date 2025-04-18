@@ -1,6 +1,6 @@
 'use strict';
 
-const errorOverlayMiddleware = require('react-error-overlay/middleware');
+//const errorOverlayMiddleware = require('react-error-overlay/middleware');
 const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
 const config = require('./webpack.config.dev');
 const paths = require('./paths');
@@ -8,8 +8,10 @@ const paths = require('./paths');
 const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
 const host = process.env.HOST || '0.0.0.0';
 
-module.exports = function(proxy, allowedHost) {
+module.exports = function(proxy, allowedHost, port) {
   return {
+    // Note(alichry, 2025): Add port here
+    port,
     // WebpackDevServer 2.4.3 introduced a security fix that prevents remote
     // websites from potentially accessing local content through DNS rebinding:
     // https://github.com/webpack/webpack-dev-server/issues/887
@@ -26,13 +28,16 @@ module.exports = function(proxy, allowedHost) {
     // So we will disable the host check normally, but enable it if you have
     // specified the `proxy` setting. Finally, we let you override it if you
     // really know what you're doing with a special environment variable.
-    disableHostCheck:
-      !proxy || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true',
+    // Note(alichry, 2025): Remove this in favour of allowedHosts
+    // TODO(alichry): See if it's safe to apply the same logic to allowedHosts
+    // disableHostCheck:
+    //   !proxy || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true',
     // Enable gzip compression of generated files.
     compress: true,
     // Silence WebpackDevServer's own logs since they're generally not useful.
     // It will still show compile warnings and errors with this setting.
-    clientLogLevel: 'none',
+    // Note(alichry, 2025): Move opt to client.logging
+    // clientLogLevel: 'none',
     // By default WebpackDevServer serves physical files from current directory
     // in addition to all the virtual build products that it serves from memory.
     // This is confusing because those files won’t automatically be available in
@@ -47,9 +52,11 @@ module.exports = function(proxy, allowedHost) {
     // for files like `favicon.ico`, `manifest.json`, and libraries that are
     // for some reason broken when imported through Webpack. If you just want to
     // use an image, put it in `src` and `import` it from JavaScript instead.
-    contentBase: paths.appPublic,
+    // Note(alichry, 2025): Move opt to static.directory
+    // contentBase: paths.appPublic,
     // By default files from `contentBase` will not trigger a page reload.
-    watchContentBase: true,
+    // Note(alichry, 2025): Move opt to static.watch
+    // watchContentBase: true,
     // Enable hot reloading server. It will provide /sockjs-node/ endpoint
     // for the WebpackDevServer client so it can learn when the files were
     // updated. The WebpackDevServer client is included as an entry point
@@ -58,35 +65,64 @@ module.exports = function(proxy, allowedHost) {
     hot: true,
     // It is important to tell WebpackDevServer to use the same "root" path
     // as we specified in the config. In development, we always serve from /.
-    publicPath: config.output.publicPath,
+    // Note(alichry, 2025): Move opt to static key
+    // publicPath: config.output.publicPath,
+    static: {
+      directory: paths.appPublic,
+      publicPath: config.output.publicPath,
+      watch: true
+    },
     // WebpackDevServer is noisy by default so we emit custom message instead
     // by listening to the compiler events with `compiler.plugin` calls above.
-    quiet: true,
+    //quiet: true,
     // Reportedly, this avoids CPU overload on some systems.
     // https://github.com/facebookincubator/create-react-app/issues/293
-    watchOptions: {
-      // ignored: /node_modules/,
-    },
+    // Note(alichry, 2025): Not used.
+    // watchOptions: {
+    //   // ignored: /node_modules/,
+    // },
     // Enable HTTPS if the HTTPS environment variable is set to 'true'
-    https: protocol === 'https',
+    // -
+    // Note(alichry, 2025): move https opt to server
+    //https: protocol === 'https',
+    server: {
+      type: protocol === 'https' ? 'https' : 'http',
+    },
     host: host,
-    overlay: false,
+    // Note(alichry, 2025): Move overlay opt to client
+    //overlay: false,
+    client: {
+      overlay: false,
+      logging: 'none'
+    },
     historyApiFallback: {
       // Paths with dots should still use the history fallback.
       // See https://github.com/facebookincubator/create-react-app/issues/387.
       disableDotRule: true,
     },
-    public: allowedHost,
+    // Note(alichry, 2025): Switch from 'public' key to 'allowedHosts'
+    allowedHosts: [allowedHost],
     proxy,
-    setup(app) {
+
+    // Note(alichry, 2025): Switch from setup() to setupMiddlewares
+    //setup(app) {
+    setupMiddlewares(middlewares, devServer) {
+      if (!devServer) {
+        throw new Error("webpack-dev-server is not defined");
+      }
       // This lets us open files from the runtime error overlay.
-      app.use(errorOverlayMiddleware());
+      // app.use(errorOverlayMiddleware());
+      // TODO(alichry, 2025): react-error-overlay/middleware no longer
+      // exists, not sure what the right fix is.
+      //middlewares.push(errorOverlayMiddleware());
       // This service worker file is effectively a 'no-op' that will reset any
       // previous service worker registered for the same host:port combination.
       // We do this in development to avoid hitting the production cache if
       // it used the same host and port.
       // https://github.com/facebookincubator/create-react-app/issues/2272#issuecomment-302832432
-      app.use(noopServiceWorkerMiddleware());
+      // app.use(noopServiceWorkerMiddleware());
+      middlewares.push(noopServiceWorkerMiddleware());
+      return middlewares;
     },
   };
 };
