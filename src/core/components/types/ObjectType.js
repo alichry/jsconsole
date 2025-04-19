@@ -3,6 +3,7 @@ import which from '../../lib/which-type';
 import StringType from './StringType';
 import zip from 'lodash/zip';
 import flatten from 'lodash/flatten';
+import '../../jsconsole.module.css';
 
 const LIMIT_CLOSED = 5;
 
@@ -74,7 +75,7 @@ class ObjectType extends Component {
 
     if (!open && shallow) {
       return (
-        <div onClick={this.toggle} className={`type ${type}`}>
+        <div onClick={this.toggle} styleName={`type ${type}`}>
           <em>{displayName}</em>
         </div>
       );
@@ -132,7 +133,7 @@ class ObjectType extends Component {
     if (!open) {
       if (type === 'error') {
         return (
-          <div className={`type ${type}`}>
+          <div styleName={`type ${type}`}>
             <em onClick={this.toggle}>{displayName}</em>
             <span>
               {'{'} <StringType value={value.message} /> {'}'}
@@ -143,7 +144,7 @@ class ObjectType extends Component {
       if (displayName !== 'Object') {
         // just show the summary
         return (
-          <div className={`type ${type}`}>
+          <div styleName={`type ${type}`}>
             <em onClick={this.toggle}>{displayName}</em>
             <span>{'{ … }'}</span>
           </div>
@@ -160,7 +161,7 @@ class ObjectType extends Component {
             },
             (n, i) => {
               return (
-                <span key={`sep-${i}`} className="sep">
+                <span key={`sep-${i}`} styleName="sep">
                   ,
                 </span>
               );
@@ -171,14 +172,14 @@ class ObjectType extends Component {
 
       // do mini output
       return (
-        <div className="type object closed" onClick={this.toggle}>
+        <div styleName="type object closed" onClick={this.toggle}>
           <em>{displayName}</em>
           <span>{'{'} </span>
           {types.map((obj, i) => {
             if (obj && obj.key && obj.value) {
               return (
-                <span className="object-item key-value" key={`subtype-${i}`}>
-                  <span className="key">{obj.key}:</span>
+                <span className="object-item" styleName="key-value" key={`subtype-${i}`}>
+                  <span styleName="key">{obj.key}:</span>
                   <span className="value">{obj.value}</span>
                 </span>
               );
@@ -192,16 +193,16 @@ class ObjectType extends Component {
     }
 
     return (
-      <div className={`type ${type} ${open ? '' : 'closed'}`}>
-        <div className="header">
+      <div styleName={`type ${type} ${open ? '' : 'closed'}`}>
+        <div styleName="header">
           <em onClick={this.toggle}>{displayName}</em>
           <span>{'{'}</span>
         </div>
-        <div className="group">
+        <div styleName="group">
           {types.map((obj, i) => {
             return (
-              <div className="object-item key-value" key={`subtype-${i}`}>
-                <span className="key">{obj.key}:</span>
+              <div className="object-item" styleName="key-value" key={`subtype-${i}`}>
+                <span styleName="key">{obj.key}:</span>
                 <span className="value">{obj.value}</span>
               </div>
             );

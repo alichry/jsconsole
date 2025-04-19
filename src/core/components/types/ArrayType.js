@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import zip from 'lodash/zip';
 import flatten from 'lodash/flatten';
 import which from '../../lib/which-type';
+import '../../jsconsole.module.css';
 
 class ArrayType extends Component {
   constructor(props) {
@@ -30,9 +31,9 @@ class ArrayType extends Component {
 
     if (shallow && !open) {
       return (
-        <div className="type ArrayType closed" onClick={this.toggle}>
+        <div styleName="type ArrayType closed" onClick={this.toggle}>
           <em>Array</em>
-          <span className="arb-info">({length})</span>
+          <span styleName="arb-info">({length})</span>
         </div>
       );
     }
@@ -60,7 +61,7 @@ class ArrayType extends Component {
 
         if (count !== 0 && !hole) {
           newTypes.push(
-            <span key={`hole-${i}`} className="arb-info">
+            <span key={`hole-${i}`} styleName="arb-info">
               &lt;undefined × {count}&gt;
             </span>
           );
@@ -77,7 +78,7 @@ class ArrayType extends Component {
       // if there are holes at the end
       if (count !== 0) {
         newTypes.push(
-          <span key={`hole-${types.length}`} className="arb-info">
+          <span key={`hole-${types.length}`} styleName="arb-info">
             &lt;undefined × {count}&gt;
           </span>
         );
@@ -88,7 +89,10 @@ class ArrayType extends Component {
 
     if (!open && value.length > 10) {
       types.push(
-        <span key="arrayType-0" className="more arb-info">
+        <span
+          key="arrayType-0"
+          className="more"
+          styleName="arb-info">
           …
         </span>
       );
@@ -100,7 +104,7 @@ class ArrayType extends Component {
         zip(
           types,
           Array.from({ length: types.length - 1 }, (n, i) => (
-            <span key={`sep-${i}`} className="sep">
+            <span key={`sep-${i}`} styleName="sep">
               ,
             </span>
           ))
@@ -109,21 +113,21 @@ class ArrayType extends Component {
 
       // do mini output
       return (
-        <div className="type ArrayType closed" onClick={this.toggle}>
+        <div styleName="type ArrayType closed" onClick={this.toggle}>
           <em>Array</em>
-          <span className="arb-info">({length})</span>[ {types} ]
+          <span styleName="arb-info">({length})</span>[ {types} ]
         </div>
       );
     }
 
     // this is the full output view
     return (
-      <div className="type ArrayType">
-        <div onClick={this.toggle} className="header">
+      <div styleName="type ArrayType">
+        <div onClick={this.toggle} styleName="header">
           <em>Array</em>
-          <span className="arb-info">({length})</span>[
+          <span styleName="arb-info">({length})</span>[
         </div>
-        <div className="group">
+        <div styleName="group">
           {types.map((type, i) => {
             if (
               filter === null ||
@@ -132,8 +136,8 @@ class ArrayType extends Component {
               (value[i] + '').toLowerCase().includes(filter)
             ) {
               return (
-                <div className="key-value" key={`subtype-${i}`}>
-                  <span className="index">{i}:</span>
+                <div styleName="key-value" key={`subtype-${i}`}>
+                  <span styleName="index">{i}:</span>
                   {type}
                 </div>
               );

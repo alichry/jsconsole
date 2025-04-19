@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
+import '../../jsconsole.module.css';
 
 class StringType extends Component {
   constructor(props) {
@@ -30,7 +31,7 @@ class StringType extends Component {
     }
 
     const expand = (
-      <button onClick={this.onToggle} className="icon expand">
+      <button onClick={this.onToggle} styleName="icon expand">
         +
       </button>
     );
@@ -52,7 +53,7 @@ class StringType extends Component {
     ]);
 
     return (
-      <div ref={e => (this.string = e)} className={className}>
+      <div ref={e => (this.string = e)} styleName={className}>
         {multiline && expand}
         {child}
       </div>

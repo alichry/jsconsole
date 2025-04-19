@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Line from './Line';
+import '../jsconsole.module.css';
 
 let guid = 0;
 const getNext = () => guid++;

@@ -2,11 +2,22 @@
 // as the public path:
 process.env.PUBLIC_URL = process.env.PUBLIC_URL || '/';
 
+process.env.REACT_APP_VERSION = require("./package.json").version;
+
+// const CSS_MODULE_LOCAL_IDENT_NAME = 'jsconsole_[local]___[hash:base64:5]';
+// ^ The hash:base64:5 function seems to be inconsistent between
+// webpack css output and babel-plugin-react-css-modules; omitting it
+// for now.
+const CSS_MODULE_LOCAL_IDENT_NAME = 'jsconsole_[local]';
+
 module.exports = {
   eslint: {
     mode: 'file',
   },
   style: {
+    modules: {
+      localIdentName: CSS_MODULE_LOCAL_IDENT_NAME,
+    },
     css: {
       // options passed to css-loader
       loaderOptions: {
@@ -16,6 +27,17 @@ module.exports = {
         url: false,
       }
     }
+  },
+  babel: {
+    plugins: [
+      [
+        'babel-plugin-react-css-modules',
+        {
+          generateScopedName: CSS_MODULE_LOCAL_IDENT_NAME,
+          attributeNames: { activeStyleName: 'activeClassName' },
+        },
+      ],
+    ],
   },
   webpack: {
     alias: {

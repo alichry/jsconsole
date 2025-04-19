@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import debounce from 'lodash/debounce';
+import '../jsconsole.module.css';
 
 class Filter extends Component {
   componentDidUpdate(prevProps) {
@@ -21,8 +22,8 @@ class Filter extends Component {
     const className = enabled ? 'is-visible' : 'is-hidden';
 
     return (
-      <span className={`Filter ${className}`}>
-        <span className="inner">
+      <span styleName={`Filter ${className}`}>
+        <span styleName="inner">
           <input
             ref={e => (this.input = e)}
             onChange={e => {

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import '../../jsconsole.module.css';
 
 class NullType extends Component {
   shouldComponentUpdate() {
@@ -6,7 +7,7 @@ class NullType extends Component {
   }
 
   render() {
-    return <div className="type null">null</div>;
+    return <div styleName="type null">null</div>;
   }
 }
 

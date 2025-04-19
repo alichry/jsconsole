@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import which from '../../lib/which-type';
+import '../../jsconsole.module.css';
 
 class PromiseType extends Component {
   constructor(props) {
@@ -70,16 +71,16 @@ class PromiseType extends Component {
 
     if (!open) {
       return (
-        <div onClick={this.toggle} className="type entry closed">
+        <div onClick={this.toggle} className="entry" styleName="type closed">
           <em>Promise</em>
           {'{ '}
-          <div className="object-item key-value">
-            <span className="key">[[PromiseStatus]]:</span>
+          <div className="object-item" styleName="key-value">
+            <span styleName="key">[[PromiseStatus]]:</span>
             <span className="value">{status}</span>
           </div>
-          <span className="arb-info">, </span>
-          <div className="object-item key-value">
-            <span className="key">[[PromiseValue]]:</span>
+          <span styleName="arb-info">, </span>
+          <div className="object-item" styleName="key-value">
+            <span styleName="key">[[PromiseValue]]:</span>
             <span className="value">
               <Value
                 filter={filter}
@@ -95,18 +96,18 @@ class PromiseType extends Component {
     }
 
     return (
-      <div onClick={this.toggle} className="type promise">
-        <div className="header">
+      <div onClick={this.toggle} className="promise" styleName="type">
+        <div styleName="header">
           <em>Promise</em>
           <span>{'{'}</span>
         </div>
-        <div className="group">
-          <div className="object-item key-value">
-            <span className="key">[[PromiseStatus]]:</span>
+        <div styleName="group">
+          <div className="object-item" styleName="key-value">
+            <span styleName="key">[[PromiseStatus]]:</span>
             <span className="value">{status}</span>
           </div>
-          <div className="object-item key-value">
-            <span className="key">[[PromiseValue]]:</span>
+          <div className="object-item" styleName="key-value">
+            <span styleName="key">[[PromiseValue]]:</span>
             <span className="value">
               <Value
                 filter={filter}

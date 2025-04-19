@@ -1,11 +1,3 @@
-* {
-  box-sizing: border-box;
-}
-
-body, html, #root {
-  height: 100%;
-}
-
 .App {
   outline: none;
   height: 100%;
@@ -16,4 +8,8 @@ body, html, #root {
 
 .App.top {
   padding-top: 2.6rem;
+}
+
+.App * {
+  box-sizing: border-box;
 }

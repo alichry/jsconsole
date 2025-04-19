@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import '../../jsconsole.module.css';
 
 class NumberType extends Component {
   shouldComponentUpdate() {
@@ -7,7 +8,7 @@ class NumberType extends Component {
 
   render() {
     const { value } = this.props;
-    return <div className="type number">{value}</div>;
+    return <div styleName="type number">{value}</div>;
   }
 }
 
