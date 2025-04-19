@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import LineNav from './LineNav';
 import which from '../lib/which-type';
+import '../jsconsole.module.css';
 
 class Line extends Component {
   constructor(props) {
@@ -35,7 +36,7 @@ class Line extends Component {
 
     if (type === 'command') {
       line = (
-        <div className="prompt input">
+        <div styleName="prompt input">
           <LineNav value={value} />
           {value}
         </div>
@@ -50,7 +51,7 @@ class Line extends Component {
       // for LineNav I do a bit of a giggle so if it's a log, we copy the single
       // value, which is nicer for the user
       line = (
-        <div className={`prompt output ${type} ${error ? 'error' : ''}`}>
+        <div styleName={`prompt output ${type} ${error ? 'error' : ''}`}>
           <LineNav
             onFilter={filter => {
               this.setState({ filter });
@@ -87,7 +88,7 @@ class Line extends Component {
     }
 
     return (
-      <div className="Line" onClick={onFocus}>
+      <div styleName="Line" onClick={onFocus}>
         {line}
       </div>
     );

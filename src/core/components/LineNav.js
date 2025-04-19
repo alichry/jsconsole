@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Filter from './Filter';
 import CopyToClipboard from 'react-copy-to-clipboard';
+import '../jsconsole.module.css';
 
 class LineNav extends Component {
   constructor(props) {
@@ -83,14 +84,14 @@ class LineNav extends Component {
           : 'Copy as JSON';
 
     return (
-      <div className="LineNav">
+      <div styleName="LineNav">
         {typeof value === 'object' && (
           <Filter
             ref={e => (this.filter = e)}
             onFilter={onFilter}
             enabled={filter}
           >
-            <button onClick={this.toggleFilter} className="icon search">
+            <button onClick={this.toggleFilter} styleName="icon search">
               search
             </button>
           </Filter>
@@ -99,7 +100,7 @@ class LineNav extends Component {
           <a
             onClick={this.onPermalink}
             title="Permalink"
-            className="icon link"
+            styleName="icon link"
             href={`?${escape(command)}`}
           >
             link
@@ -108,7 +109,7 @@ class LineNav extends Component {
         <CopyToClipboard text={text}>
           <button
             title={copyAs}
-            className="icon copy"
+            styleName="icon copy"
             onMouseDown={() => {
               if (text === null) {
                 this.preCopy();

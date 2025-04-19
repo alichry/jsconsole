@@ -1,2 +1,4 @@
 import React from 'react';
-export default () => <div className="type undefined">undefined</div>;
+import '../../jsconsole.module.css';
+
+export default () => <div styleName="type undefined">undefined</div>;

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import which from '../../lib/which-type';
+import '../../jsconsole.module.css';
 
 class EntryType extends Component {
   constructor(props) {
@@ -32,12 +33,12 @@ class EntryType extends Component {
 
     if (!open) {
       return (
-        <div onClick={this.toggle} className="type entry closed">
-          <div className="object-item key-value">
-            <span className="key">
+        <div onClick={this.toggle} className="entry" styleName="type closed">
+          <div className="object-item" styleName="key-value">
+            <span styleName="key">
               <Key allowOpen={open} value={key} />
             </span>
-            <span className="arb-info">=> </span>
+            <span styleName="arb-info">=> </span>
             <span className="value">
               <Value allowOpen={open} value={value} />
             </span>
@@ -47,17 +48,17 @@ class EntryType extends Component {
     }
 
     return (
-      <div onClick={this.toggle} className="type entry">
+      <div onClick={this.toggle} className="entry" styleName="type">
         <span>{'{'}</span>
-        <div className="group">
-          <div className="object-item key-value">
-            <span className="key">key:</span>
+        <div styleName="group">
+          <div className="object-item" styleName="key-value">
+            <span styleName="key">key:</span>
             <span className="value">
               <Key allowOpen={open} value={key} />
             </span>
           </div>
-          <div className="object-item key-value">
-            <span className="key">value:</span>
+          <div className="object-item" styleName="key-value">
+            <span styleName="key">value:</span>
             <span className="value">
               <Value allowOpen={open} value={value} />
             </span>

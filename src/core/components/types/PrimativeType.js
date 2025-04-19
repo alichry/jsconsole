@@ -1,2 +1,4 @@
 import React from 'react';
-export default ({ children }) => <div className="primative">{children}</div>;
+import '../../jsconsole.module.css';
+
+export default ({ children }) => <div styleName="primative">{children}</div>;

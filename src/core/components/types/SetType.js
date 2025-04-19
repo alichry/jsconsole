@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Entry from './EntryType';
 import zip from 'lodash/zip';
 import flatten from 'lodash/flatten';
+import '../../jsconsole.module.css';
 
 class SetType extends Component {
   constructor(props) {
@@ -35,9 +36,9 @@ class SetType extends Component {
 
     if (shallow && !open) {
       return (
-        <div className="type ArrayType closed" onClick={this.toggle}>
+        <div styleName="type ArrayType closed" onClick={this.toggle}>
           <em>{displayName}</em>
-          <span className="arb-info">({length})</span>
+          <span styleName="arb-info">({length})</span>
         </div>
       );
     }
@@ -62,7 +63,7 @@ class SetType extends Component {
 
     if (!open && length > 10) {
       types.push(
-        <span key="setTypeMore-0" className="more arb-info">
+        <span key="setTypeMore-0" className="more" styleName="arb-info">
           …
         </span>
       );
@@ -74,7 +75,7 @@ class SetType extends Component {
         zip(
           types,
           Array.from({ length: length - 1 }, (n, i) => (
-            <span key={`sep-${i}`} className="sep">
+            <span key={`sep-${i}`} styleName="sep">
               ,
             </span>
           ))
@@ -83,12 +84,12 @@ class SetType extends Component {
 
       // do mini output
       return (
-        <div className="type set closed" onClick={this.toggle}>
+        <div className="set" styleName="type closed" onClick={this.toggle}>
           <em>{displayName}</em>
-          <span className="arb-info">({length})</span>
+          <span styleName="arb-info">({length})</span>
           <span> {'{'} </span>
           {types.map((type, i) => (
-            <div className="key-value" key={`subtype-${i}`}>
+            <div styleName="key-value" key={`subtype-${i}`}>
               {type}
             </div>
           ))}
@@ -98,15 +99,15 @@ class SetType extends Component {
     }
 
     return (
-      <div className="type set" onClick={this.toggle}>
+      <div className="set" styleName="type" onClick={this.toggle}>
         <em>{displayName}</em>
-        <span className="arb-info">({length})</span>
+        <span styleName="arb-info">({length})</span>
         <span> {'{'} </span>
-        <div className="group">
-          <span className="arb-info">[[Entries]]:</span>
+        <div styleName="group">
+          <span styleName="arb-info">[[Entries]]:</span>
           {types.map((type, i) => (
-            <div className="key-value" key={`subtype-${i}`}>
-              <span className="index">{i}:</span>
+            <div styleName="key-value" key={`subtype-${i}`}>
+              <span styleName="index">{i}:</span>
               {type}
             </div>
           ))}

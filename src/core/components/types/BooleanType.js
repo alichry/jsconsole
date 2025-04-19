@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import '../../jsconsole.module.css';
 
 class BooleanType extends Component {
   shouldComponentUpdate() {
@@ -7,7 +8,7 @@ class BooleanType extends Component {
 
   render() {
     const { value } = this.props;
-    return <div className="bool type">{value ? 'true' : 'false'}</div>;
+    return <div styleName="bool type">{value ? 'true' : 'false'}</div>;
   }
 }
 

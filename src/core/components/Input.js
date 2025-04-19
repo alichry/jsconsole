@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import '../jsconsole.module.css';
 
 // TODO import Autocomplete from './Autocomplete';
 import keycodes from '../lib/keycodes';
@@ -92,10 +93,10 @@ class Input extends Component {
   render() {
     const { autoFocus } = this.props;
     return (
-      <div className="Input">
+      <div styleName="Input">
         {/*<Autocomplete value={this.state.value} />*/}
         <textarea
-          className="cli"
+          styleName="cli"
           rows={this.state.rows}
           autoFocus={autoFocus}
           ref={e => {

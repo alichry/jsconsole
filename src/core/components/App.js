@@ -7,6 +7,7 @@ import Input from '../containers/Input';
 
 import run, { bindConsole, createContainer } from '../lib/run';
 import internalCommands from '../lib/internal-commands';
+import '../jsconsole.module.css';
 
 // this is lame, but it's a list of key.code that do stuff in the input that we _want_.
 const doStuffKeys =
@@ -93,14 +94,14 @@ class App extends Component {
   render() {
     const { commands = [], theme, layout } = this.props;
 
-    const className = classnames(['App', `theme-${theme}`, layout]);
+    const className = classnames(['App', theme ? `theme-${theme}` : undefined, layout]);
 
     return (
       <div
         tabIndex="-1"
         onKeyDown={this.triggerFocus}
         ref={e => (this.app = e)}
-        className={className}
+        styleName={className}
       >
         <Console
           ref={e => (this.console = e)}
