@@ -4,7 +4,8 @@
 
 module.exports = {
     extends: [
-      "react-app"
+      'eslint-config-react-app',
+      "prettier"
     ],
     env: {
       es6: true,
@@ -17,7 +18,6 @@ module.exports = {
         jsx: true,
       },
     },
-    plugins: ['react'],
     rules: {
       indent: ['error', 2, { SwitchCase: 1 }],
       'linebreak-style': ['error', 'unix'],
