@@ -59,8 +59,8 @@
     "lib": "rm -rf dist; npm run styles; NODE_ENV=production babel src/core --out-dir dist --copy-files --ignore '__tests__'",
     "deploy": "npm run build && s3_website push",
     "prepare": "npm run lib",
-    "build": "PUBLIC_URL=/ craco build",
-    "start": "PUBLIC_URL=/ craco start",
+    "build": "craco build",
+    "start": "craco start",
     "test": "craco test"
   },
   "main": "dist/index.js",
