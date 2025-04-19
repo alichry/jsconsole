@@ -1,3 +1,6 @@
+// Do not use "homepage" value defined in package.json
+// as the public path:
+process.env.PUBLIC_URL = process.env.PUBLIC_URL || '/';
 
 module.exports = {
   eslint: {
