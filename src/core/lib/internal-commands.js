@@ -132,7 +132,7 @@ const listen = async ({ args: [id], console: internalConsole }) => {
       }
     };
 
-    sse.onclose = function() {
+    sse.onclose = function () {
       internalConsole.log('Remote connection closed');
     };
   });
