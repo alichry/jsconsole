@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Line from './Line';
 import '../jsconsole.module.css';
+import { nativeConsoleProxy } from '../lib/run';
 
 let guid = 0;
 const getNext = () => guid++;
@@ -73,9 +74,20 @@ class Console extends Component {
         return acc;
       }, [])
     };
-    this.log = this.log.bind(this);
-    this.clear = this.clear.bind(this);
-    this.push = this.push.bind(this);
+    Object.keys(this).forEach(prop => {
+      const value = this[prop];
+      if (typeof value !== 'function') {
+        return;
+      }
+      this[prop] = (...args) => {
+        try {
+          value.apply(this, args);
+        } catch (e) {
+          nativeConsoleProxy.error(`JSConsoleError: ${typeof e === 'object' && e.message || String(e)}`);
+          nativeConsoleProxy.error(e);
+        }
+      };
+    });
   }
 
   push(command) {
@@ -83,11 +95,11 @@ class Console extends Component {
     this.setState({
       commands: this.state.commands.concat([[next, command]])
     });
-  }
+  };
 
-  clear() {
+  clear = () => {
     this.setState({ commands: [] });
-  }
+  };
 
   error = (...rest) => {
     const { html, args } = interpolate(...rest);
@@ -99,7 +111,7 @@ class Console extends Component {
     });
   };
 
-  assert(test, ...rest) {
+  assert = (test, ...rest) => {
     // intentional loose assertion test - matches devtools
     if (!test) {
       let msg = rest.shift();
@@ -113,7 +125,7 @@ class Console extends Component {
         type: 'log',
       });
     }
-  }
+  };
 
   dir = (...rest) => {
     const { html, args } = interpolate(...rest);
@@ -126,7 +138,7 @@ class Console extends Component {
     });
   };
 
-  warn(...rest) {
+  warn = (...rest) => {
     const { html, args } = interpolate(...rest);
     this.push({
       error: true,
@@ -135,12 +147,12 @@ class Console extends Component {
       value: args,
       type: 'log',
     });
-  }
+  };
 
   debug = (...args) => this.log(...args);
   info = (...args) => this.log(...args);
 
-  log(...rest) {
+  log = (...rest) => {
     const { html, args } = interpolate(...rest);
 
     this.push({
@@ -148,7 +160,7 @@ class Console extends Component {
       html,
       type: 'log',
     });
-  }
+  };
 
   render() {
     const { commands = [] } = this.state || {};
@@ -168,7 +180,7 @@ class Console extends Component {
         })}
       </div>
     );
-  }
+  };
 }
 
 export default Console;

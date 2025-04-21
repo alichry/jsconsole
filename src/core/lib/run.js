@@ -4,6 +4,17 @@ import * as walk from 'babylon-walk';
 
 import copy from 'copy-to-clipboard';
 
+const nativeConsole = window.console;
+const nativeConsoleProps = { ...nativeConsole };
+export const nativeConsoleProxy = new Proxy({}, {
+  get(target, prop, receiver) {
+    if (typeof nativeConsoleProps[prop] === "function") {
+      return nativeConsoleProps[prop].bind(nativeConsole);
+    }
+    return nativeConsoleProps[prop];
+  }
+});
+
 export class Instance {
   container = null;
 
@@ -31,12 +42,12 @@ export class Instance {
     ];
 
     apply.forEach(method => {
-
       this.container.contentWindow.console[method] = (...args) => {
+        nativeConsoleProxy[method](...args);
         __console[method].apply(__console, args);
-        if (this.container.contentWindow !== window) {
-          window.console[method].apply(window.console, args);
-        }
+        // if (this.container.contentWindow !== window) {
+        //   window.console[method].apply(window.console, args);
+        // }
       };
     });
   }
