@@ -1,6 +1,7 @@
 {
   "name": "@alichry/jsconsole",
-  "version": "2.1.2",
+  "description": "Remy's web based JS console with CSS-scoped React components and configurable execution environment (iframe or top-level)",
+  "version": "3.0.0",
   "now": {
     "alias": "2.jsconsole.com"
   },
@@ -56,7 +57,6 @@
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   },
-  "_proxy": "http://localhost:3001",
   "scripts": {
     "prettier": "prettier 'src/**/*.js' --check || echo 'To fix the above, execute $ npm run prettier:write'",
     "prettier:write": "prettier 'src/**/*.js' --write",
@@ -74,7 +74,6 @@
   "files": [
     "dist/"
   ],
-  "description": "Web based console - for presentations, workshops and jsbin",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/remy/jsconsole.git"
