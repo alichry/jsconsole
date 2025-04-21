@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Line from './Line';
 import '../jsconsole.module.css';
+import { nativeConsoleProxy } from '../lib/run';
 
 let guid = 0;
 const getNext = () => guid++;
@@ -90,13 +91,19 @@ class Console extends Component {
   }
 
   error = (...rest) => {
-    const { html, args } = interpolate(...rest);
-    this.push({
-      error: true,
-      html,
-      value: args,
-      type: 'log',
-    });
+    try {
+      const { html, args } = interpolate(...rest);
+      this.push({
+        error: true,
+        html,
+        value: args,
+        type: 'log',
+      });
+    } catch (e) {
+      nativeConsoleProxy.error(`JSConsoleError: ${typeof e === "object" && e.message || String(e)}`);
+      nativeConsoleProxy.error(e);
+    }
+
   };
 
   assert(test, ...rest) {
