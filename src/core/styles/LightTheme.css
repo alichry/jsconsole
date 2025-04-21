@@ -1,0 +1,5 @@
+.theme-light {
+    /* Default theme. Define it so that
+       babel-plugin-react-css-modules would
+       not complain about missing class 'theme-light' */
+}

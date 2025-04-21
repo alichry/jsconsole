@@ -44,15 +44,17 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
     "node-uuid": "^1.4.8",
-    "object-assign": "4.1.1",
     "preact": "^10.26.5",
     "prettier": "^3.5.3",
     "prettier-eslint": "^16.4.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
-    "redbox-react": "^1.5.0",
     "redux-devtools": "^3.4.0",
     "webpack-cli": "^6.0.1"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
   },
   "_proxy": "http://localhost:3001",
   "scripts": {
