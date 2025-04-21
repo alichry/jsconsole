@@ -1,4 +1,4 @@
-const { CSS_MODULE_LOCAL_IDENT_NAME } = require("./craco.config");
+const cracoConfig = require("./craco.config");
 
 module.exports = function (api) {
   api.cache.forever();
@@ -12,7 +12,7 @@ module.exports = function (api) {
       [
         "babel-plugin-react-css-modules",
         {
-          "generateScopedName": CSS_MODULE_LOCAL_IDENT_NAME,
+          "generateScopedName": cracoConfig.style.modules.localIdentName,
           "attributeNames": {
             "activeStyleName": "activeClassName"
           }
