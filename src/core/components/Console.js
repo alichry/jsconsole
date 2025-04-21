@@ -74,39 +74,44 @@ class Console extends Component {
         return acc;
       }, [])
     };
-    this.log = this.log.bind(this);
-    this.clear = this.clear.bind(this);
-    this.push = this.push.bind(this);
+    Object.keys(this).forEach(prop => {
+      const value = this[prop];
+      if (typeof value !== 'function') {
+        return;
+      }
+      this[prop] = (...args) => {
+        try {
+          value.apply(this, args);
+        } catch (e) {
+          nativeConsoleProxy.error(`JSConsoleError: ${typeof e === "object" && e.message || String(e)}`);
+          nativeConsoleProxy.error(e);
+        }
+      }
+    });
   }
 
-  push(command) {
+  push = (command) => {
     const next = getNext();
     this.setState({
       commands: this.state.commands.concat([[next, command]])
     });
   }
 
-  clear() {
+  clear = () => {
     this.setState({ commands: [] });
   }
 
   error = (...rest) => {
-    try {
-      const { html, args } = interpolate(...rest);
-      this.push({
-        error: true,
-        html,
-        value: args,
-        type: 'log',
-      });
-    } catch (e) {
-      nativeConsoleProxy.error(`JSConsoleError: ${typeof e === "object" && e.message || String(e)}`);
-      nativeConsoleProxy.error(e);
-    }
-
+    const { html, args } = interpolate(...rest);
+    this.push({
+      error: true,
+      html,
+      value: args,
+      type: 'log',
+    });
   };
 
-  assert(test, ...rest) {
+  assert = (test, ...rest) => {
     // intentional loose assertion test - matches devtools
     if (!test) {
       let msg = rest.shift();
@@ -133,7 +138,7 @@ class Console extends Component {
     });
   };
 
-  warn(...rest) {
+  warn = (...rest) => {
     const { html, args } = interpolate(...rest);
     this.push({
       error: true,
@@ -147,7 +152,7 @@ class Console extends Component {
   debug = (...args) => this.log(...args);
   info = (...args) => this.log(...args);
 
-  log(...rest) {
+  log = (...rest) => {
     const { html, args } = interpolate(...rest);
 
     this.push({
@@ -157,7 +162,7 @@ class Console extends Component {
     });
   }
 
-  render() {
+  render = () => {
     const { commands = [] } = this.state || {};
     return (
       <div
