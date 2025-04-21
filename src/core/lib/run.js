@@ -7,6 +7,17 @@ import copy from 'copy-to-clipboard';
 export class Instance {
   container = null;
 
+  constructor(opts) {
+    this.opts = {
+      environment: 'iframe',
+      ...opts
+    };
+  }
+
+  get inIframe() {
+    return this.opts.environment === 'iframe';
+  }
+
   bindConsole(__console) {
     // supported methods
     const apply = [
@@ -21,9 +32,12 @@ export class Instance {
     ];
 
     apply.forEach(method => {
+
       this.container.contentWindow.console[method] = (...args) => {
-        window.console[method].apply(window.console, args);
         __console[method].apply(__console, args);
+        if (this.container.contentWindow !== window) {
+          window.console[method].apply(window.console, args);
+        }
       };
     });
   }
@@ -32,8 +46,8 @@ export class Instance {
     return this.container;
   }
 
-  setContainer(iframe) {
-    this.container = iframe;
+  setContainer(container) {
+    this.container = container;
     const win = this.container.contentWindow;
     const doc = this.container.contentDocument;
   
@@ -43,7 +57,9 @@ export class Instance {
   }
 
   createContainer() {
-    const container = document.createElement('iframe');
+    const container = document.createElement(
+      this.inIframe ? 'iframe' : 'div'
+    );
     container.width = container.height = 1;
     container.style.opacity = 0;
     container.style.border = 0;
@@ -51,6 +67,10 @@ export class Instance {
     container.style.top = '-100px';
     container.setAttribute('name', '<proxy>');
     document.body.appendChild(container);
+    if (! this.inIframe) {
+      container.contentWindow = window;
+      container.contentDocument = window.document;
+    }
     this.setContainer(container);
   }
 

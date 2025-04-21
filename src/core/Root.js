@@ -5,7 +5,7 @@ import App from './containers/App';
 import PropTypes from 'prop-types';
 import { setTheme } from './actions/Settings';
 
-export default function Root({ defaultTheme }) {
+export default function Root({ defaultTheme, ...appProps }) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     const run = () => {
@@ -25,11 +25,12 @@ export default function Root({ defaultTheme }) {
   }
   return (
     <Provider store={store}>
-      <App />
+      <App {...appProps} />
     </Provider>
   );
 }
 
 Root.propTypes = {
-  defaultTheme: PropTypes.oneOf(['light', 'dark'])
+  defaultTheme: PropTypes.oneOf(['light', 'dark']),
+  ...App.propTypes
 };
