@@ -5,8 +5,8 @@ import classnames from 'classnames';
 import Console from './Console';
 import Input from '../containers/Input';
 
-import run, { bindConsole, createContainer } from '../lib/run';
-import internalCommands from '../lib/internal-commands';
+import { Instance } from '../lib/run';
+import { InternalCommandRunner } from '../lib/internal-commands';
 import '../jsconsole.module.css';
 
 // this is lame, but it's a list of key.code that do stuff in the input that we _want_.
@@ -16,6 +16,8 @@ const doStuffKeys =
 class App extends Component {
   constructor(props) {
     super(props);
+    this.inst = new Instance();
+    this.internalCommands = new InternalCommandRunner();
     this.onRun = this.onRun.bind(this);
     this.triggerFocus = this.triggerFocus.bind(this);
   }
@@ -29,7 +31,7 @@ class App extends Component {
         command,
         value: command,
       });
-      const res = await run(command);
+      const res = await this.inst.run(command);
       console.push({
         command,
         type: 'response',
@@ -45,7 +47,7 @@ class App extends Component {
       cmd = 'history';
     }
 
-    if (!internalCommands[cmd]) {
+    if (!this.internalCommands[cmd]) {
       console.push({
         command,
         error: true,
@@ -55,7 +57,7 @@ class App extends Component {
       return;
     }
 
-    let res = await internalCommands[cmd]({ args, console, app: this });
+    let res = await this.internalCommands[cmd]({ args, console, app: this });
 
     if (typeof res === 'string') {
       res = { value: res };
@@ -73,8 +75,8 @@ class App extends Component {
   }
 
   componentDidMount() {
-    createContainer();
-    bindConsole(this.console);
+    this.inst.createContainer();
+    this.inst.bindConsole(this.console);
     const query = decodeURIComponent(window.location.search.substr(1));
     if (query) {
       this.onRun(query);

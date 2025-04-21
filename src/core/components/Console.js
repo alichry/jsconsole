@@ -67,10 +67,12 @@ function interpolate(...args) {
 class Console extends Component {
   constructor(props) {
     super(props);
-    this.state = (props.commands || []).reduce((acc, curr) => {
-      acc[getNext()] = curr;
-      return acc;
-    }, {});
+    this.state = {
+      commands: (props.commands || []).reduce((acc, curr) => {
+        acc.push([[getNext(), curr]]);
+        return acc;
+      }, [])
+    };
     this.log = this.log.bind(this);
     this.clear = this.clear.bind(this);
     this.push = this.push.bind(this);
@@ -78,12 +80,13 @@ class Console extends Component {
 
   push(command) {
     const next = getNext();
-    this.setState({ [next]: command });
+    this.setState({
+      commands: this.state.commands.concat([[next, command]])
+    });
   }
 
   clear() {
-    this.state = {}; // eslint-disable-line react/no-direct-mutation-state
-    this.forceUpdate();
+    this.setState({ commands: [] });
   }
 
   error = (...rest) => {
@@ -148,12 +151,7 @@ class Console extends Component {
   }
 
   render() {
-    const commands = this.state || {};
-    const keys = Object.keys(commands);
-    if (this.props.reverse) {
-      keys.reverse();
-    }
-
+    const { commands = [] } = this.state || {};
     return (
       <div
         className="react-console-container"
@@ -161,9 +159,13 @@ class Console extends Component {
           e.stopPropagation(); // prevent the focus on the input element
         }}
       >
-        {keys.map(_ => (
-          <Line key={`line-${_}`} {...commands[_]} />
-        ))}
+        {commands.map((_, index) => {
+          if (this.props.reverse) {
+            index = commands.length - 1 - index;
+          }
+          const [key, code] = commands[index];
+          return <Line key={`line-${key}`} {...code} />;
+        })}
       </div>
     );
   }
