@@ -1,9 +1,12 @@
 {
   "name": "@alichry/jsconsole",
   "description": "Remy's web based JS console with CSS-scoped React components and configurable execution environment (iframe or top-level)",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "now": {
     "alias": "2.jsconsole.com"
+  },
+  "engines" : {
+    "node" : "22.x.x"
   },
   "prettier": {
     "arrowParens": "avoid",
@@ -54,8 +57,8 @@
     "webpack-cli": "^6.0.1"
   },
   "peerDependencies": {
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react": ">=16.8.0 <19",
+    "react-dom": ">=16.8.0 <19"
   },
   "scripts": {
     "prettier": "prettier 'src/**/*.js' --check || echo 'To fix the above, execute $ npm run prettier:write'",
