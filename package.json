@@ -18,18 +18,15 @@
     "useTabs": false
   },
   "dependencies": {
-    "@preact/compat": "^16.9.0",
+    "babel-plugin-react-css-modules": "^5.2.6",
     "babylon": "^6.18.0",
     "babylon-walk": "^1.0.2",
     "classnames": "^2.2.5",
     "copy-to-clipboard": "^3.0.8",
     "is-url": "^1.2.4",
     "lodash": "^4.17.4",
-    "preact": "^10.26.5",
     "prop-types": "^15.5.10",
-    "react": "^16.14.0",
     "react-copy-to-clipboard": "^5.0.0",
-    "react-dom": "^16.14.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2"
   },
@@ -40,16 +37,22 @@
     "@babel/parser": "^7.27.0",
     "@babel/preset-env": "^7.26.9",
     "@craco/craco": "^7.1.0",
-    "babel-plugin-react-css-modules": "^5.2.6",
+    "@preact/compat": "^16.9.0",
+    "babel-plugin-search-and-replace": "^1.1.1",
+    "babel-plugin-transform-replace-expressions": "^0.2.0",
     "body-parser": "^1.17.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.2",
     "node-uuid": "^1.4.8",
     "object-assign": "4.1.1",
+    "preact": "^10.26.5",
     "prettier": "^3.5.3",
     "prettier-eslint": "^16.4.1",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "redbox-react": "^1.5.0",
-    "redux-devtools": "^3.4.0"
+    "redux-devtools": "^3.4.0",
+    "webpack-cli": "^6.0.1"
   },
   "_proxy": "http://localhost:3001",
   "scripts": {
@@ -57,7 +60,7 @@
     "prettier:write": "prettier 'src/**/*.js' --write",
     "styles": "cat src/core/styles/*.css > src/core/jsconsole.module.css",
     "watch": "nodemon -w src/ -e css -x 'npm run styles'",
-    "lib": "rm -rf dist; npm run styles; NODE_ENV=production babel src/core --out-dir dist --copy-files --ignore '__tests__'",
+    "lib": "rm -rf dist; npm run styles; NODE_ENV=production webpack --config webpack.lib.config.cjs; babel --config-file ./babel.lib.config.js --out-dir dist --ignore '__tests__'  src/core",
     "deploy": "npm run build && s3_website push",
     "prepare": "npm run lib",
     "prebuild": "npm run styles",
@@ -69,12 +72,6 @@
   "files": [
     "dist/"
   ],
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ]
-  },
   "description": "Web based console - for presentations, workshops and jsbin",
   "repository": {
     "type": "git",
