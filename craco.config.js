@@ -8,7 +8,7 @@ process.env.REACT_APP_VERSION = require("./package.json").version;
 // ^ The hash:base64:5 function seems to be inconsistent between
 // webpack css output and babel-plugin-react-css-modules; omitting it
 // for now.
-const CSS_MODULE_LOCAL_IDENT_NAME = 'jsconsole_[local]';
+const CSS_MODULE_LOCAL_IDENT_NAME = 'thirdparty_jsconsole_[local]';
 
 module.exports = {
   eslint: {
@@ -21,10 +21,7 @@ module.exports = {
     css: {
       // options passed to css-loader
       loaderOptions: {
-        // Note(alichry, 2025): URLs specified in jsconsole.css
-        // are not aligned with the project directory path but rather
-        // to the public/ directory. We disable it to enable compilation
-        url: false,
+        url: true,
       }
     }
   },
