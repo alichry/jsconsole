@@ -83,23 +83,23 @@ class Console extends Component {
         try {
           value.apply(this, args);
         } catch (e) {
-          nativeConsoleProxy.error(`JSConsoleError: ${typeof e === "object" && e.message || String(e)}`);
+          nativeConsoleProxy.error(`JSConsoleError: ${typeof e === 'object' && e.message || String(e)}`);
           nativeConsoleProxy.error(e);
         }
-      }
+      };
     });
   }
 
-  push = (command) => {
+  push(command) {
     const next = getNext();
     this.setState({
       commands: this.state.commands.concat([[next, command]])
     });
-  }
+  };
 
   clear = () => {
     this.setState({ commands: [] });
-  }
+  };
 
   error = (...rest) => {
     const { html, args } = interpolate(...rest);
@@ -125,7 +125,7 @@ class Console extends Component {
         type: 'log',
       });
     }
-  }
+  };
 
   dir = (...rest) => {
     const { html, args } = interpolate(...rest);
@@ -147,7 +147,7 @@ class Console extends Component {
       value: args,
       type: 'log',
     });
-  }
+  };
 
   debug = (...args) => this.log(...args);
   info = (...args) => this.log(...args);
@@ -160,9 +160,9 @@ class Console extends Component {
       html,
       type: 'log',
     });
-  }
+  };
 
-  render = () => {
+  render() {
     const { commands = [] } = this.state || {};
     return (
       <div
@@ -180,7 +180,7 @@ class Console extends Component {
         })}
       </div>
     );
-  }
+  };
 }
 
 export default Console;
