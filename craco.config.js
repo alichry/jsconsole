@@ -32,6 +32,12 @@ module.exports = {
         {
           generateScopedName: CSS_MODULE_LOCAL_IDENT_NAME,
           attributeNames: { activeStyleName: 'activeClassName' },
+          // ObjectType.js embeds styleNames depending on the
+          // toString output of an object. Hence, babel-plugin-react-css-modules
+          // might complain about a classname such as [object DOMException]
+          // being not found.
+          handleMissingStyleName: process.env.NODE_ENV === "production"
+            ? "ignore" : "warn"
         },
       ],
     ],

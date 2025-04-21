@@ -9,20 +9,7 @@ module.exports = function (api) {
       "@babel/preset-react"
     ],
     "plugins": [
-      [
-        "babel-plugin-react-css-modules",
-        {
-          "generateScopedName": cracoConfig.style.modules.localIdentName,
-          "attributeNames": {
-            "activeStyleName": "activeClassName"
-          },
-          // ObjectType.js embeds styleNames depending on the
-          // toString output of an object. Hence, babel-plugin-react-css-modules
-          // might complain about a classname such as [object DOMException]
-          // being not found.
-          "handleMissingStyleName": "warn"
-        }
-      ],
+      ...cracoConfig.babel.plugins,
       [
         "babel-plugin-transform-replace-expressions",
         {

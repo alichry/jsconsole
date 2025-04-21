@@ -9,8 +9,7 @@ export class Instance {
 
   constructor(opts) {
     this.opts = {
-      environment: 'iframe',
-      ...opts
+      environment: opts.environment || 'iframe'
     };
   }
 
