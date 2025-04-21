@@ -16,7 +16,7 @@ const doStuffKeys =
 class App extends Component {
   constructor(props) {
     super(props);
-    this.inst = new Instance();
+    this.inst = new Instance({ environment: props.environment });
     this.internalCommands = new InternalCommandRunner();
     this.onRun = this.onRun.bind(this);
     this.triggerFocus = this.triggerFocus.bind(this);
@@ -122,6 +122,10 @@ class App extends Component {
     );
   }
 }
+
+App.propTypes = {
+  environment: PropTypes.oneOf(['iframe', 'top-level'])
+};
 
 App.contextTypes = { store: PropTypes.object };
 
