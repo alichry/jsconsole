@@ -6,7 +6,7 @@ import Console from './Console';
 import Input from '../containers/Input';
 
 import { Instance } from '../lib/run';
-import { InternalCommandRunner } from '../lib/internal-commands';
+import { InternalCommandRunner, InternalCommand } from '../lib/internal-commands';
 import '../jsconsole.module.css';
 
 // this is lame, but it's a list of key.code that do stuff in the input that we _want_.
@@ -17,22 +17,19 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.inst = new Instance({ environment: props.environment });
-    this.internalCommands = new InternalCommandRunner();
     this.onRun = this.onRun.bind(this);
     this.triggerFocus = this.triggerFocus.bind(this);
   }
 
   async onRun(command) {
-    const console = this.console;
-
     if (command[0] !== ':') {
-      console.push({
+      this.console.push({
         type: 'command',
         command,
         value: command,
       });
       const res = await this.inst.run(command);
-      console.push({
+      this.console.push({
         command,
         type: 'response',
         ...res,
@@ -41,42 +38,37 @@ class App extends Component {
     }
 
     let [cmd, ...args] = command.slice(1).split(' ');
-
-    if (/^\d+$/.test(cmd)) {
-      args = [parseInt(cmd, 10)];
-      cmd = 'history';
-    }
-
-    if (!this.internalCommands[cmd]) {
-      console.push({
+    let res;
+    try {
+      res = await this.internalCommands.execute(cmd, args);
+    } catch (e) {
+      this.console.push({
         command,
         error: true,
-        value: new Error(`No such jsconsole command "${command}"`),
-        type: 'response',
+        value: e,
+        type: 'response'
       });
       return;
     }
-
-    let res = await this.internalCommands[cmd]({ args, console, app: this });
-
-    if (typeof res === 'string') {
-      res = { value: res };
-    }
-
     if (res !== undefined) {
-      console.push({
+      this.console.push({
         command,
         type: 'log',
         ...res,
       });
     }
-
-    return;
   }
 
   componentDidMount() {
     this.inst.createContainer();
     this.inst.bindConsole(this.console);
+    this.internalCommands = new InternalCommandRunner({
+      context: {
+        app: this,
+        console: this.console
+      },
+      extraCommands: this.props.extraCommands || []
+    });
     const query = decodeURIComponent(window.location.search.substr(1));
     if (query) {
       this.onRun(query);
@@ -94,7 +86,7 @@ class App extends Component {
   }
 
   render() {
-    const { commands = [], theme, layout } = this.props;
+    const { theme, layout } = this.props;
 
     const className = classnames(['App', theme ? `theme-${theme}` : undefined, layout]);
 
@@ -107,7 +99,6 @@ class App extends Component {
       >
         <Console
           ref={e => (this.console = e)}
-          commands={commands}
           reverse={layout === 'top'}
         />
         <Input
@@ -124,7 +115,16 @@ class App extends Component {
 }
 
 App.propTypes = {
-  environment: PropTypes.oneOf(['iframe', 'top-level'])
+  environment: PropTypes.oneOf(['iframe', 'top-level']),
+  extraCommands: PropTypes.arrayOf(function(propValue, key, componentName, location, propFullName) {
+    const item = propValue[key];
+    if (!(item instanceof InternalCommand)) {
+      return new Error(
+        'Invalid prop `' + propFullName + '` supplied to' +
+        ' `' + componentName + '`. Validation failed.'
+      );
+    }
+  })
 };
 
 App.contextTypes = { store: PropTypes.object };
