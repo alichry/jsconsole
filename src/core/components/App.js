@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
+import { cn } from '../utils/joinClassName';
 
 import Console from './Console';
 import Input from '../containers/Input';
@@ -88,18 +88,17 @@ class App extends Component {
   render() {
     const { theme, layout } = this.props;
 
-    const className = classnames([
-      'App',
-      theme ? `theme-${theme}` : undefined, layout,
-      this.props.className
-    ]);
-
     return (
       <div
         tabIndex="-1"
         onKeyDown={this.triggerFocus}
         ref={e => (this.app = e)}
-        styleName={className}
+        className={this.props.className}
+        styleName={cn(
+          'App',
+          theme ? `theme-${theme}` : undefined,
+          layout
+        )}
       >
         <Console
           ref={e => (this.console = e)}
