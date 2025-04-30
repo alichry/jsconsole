@@ -25,7 +25,6 @@
     "babel-plugin-react-css-modules": "^5.2.6",
     "babylon": "^6.18.0",
     "babylon-walk": "^1.0.2",
-    "classnames": "^2.2.5",
     "copy-to-clipboard": "^3.0.8",
     "is-url": "^1.2.4",
     "lodash": "^4.17.4",

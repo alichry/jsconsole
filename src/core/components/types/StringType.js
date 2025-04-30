@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import classnames from 'classnames';
+import { cn } from '../../utils/joinClassName';
 import '../../jsconsole.module.css';
 
 class StringType extends Component {
@@ -42,15 +42,13 @@ class StringType extends Component {
       value
     );
 
-    const className = classnames([
+    const className = cn(
       'type',
       'string',
-      {
-        toggle: expanded,
-        bareString: bare,
-        quote: !bare,
-      },
-    ]);
+      expanded && 'toggle',
+      bare && 'bareString',
+      !bare && 'quote'
+    );
 
     return (
       <div ref={e => (this.string = e)} styleName={className}>
