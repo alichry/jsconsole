@@ -1,4 +1,3 @@
-/*global window EventSource fetch */
 import isUrl from 'is-url';
 
 const version = process.env.REACT_APP_VERSION;
@@ -7,37 +6,105 @@ const API = process.env.REACT_APP_API || '';
 // Missing support
 // :load <url> - to inject new DOM
 
-// TODO (improvement): write a constructor
-// that accepts the App and Instance objects instead of
-// having consumers pass it on each cmd call.
-export class InternalCommandRunner {
-  welcome = () => ({
+const credits = 'Built by <a href="https://twitter.com/rem" target="_blank">@rem</a> • <a href="https://github.com/remy/jsconsole" target="_blank">open source</a> • <a href="https://www.paypal.me/rem/9.99usd" target="_blank">donate</a>';
+
+export class InternalCommand {
+  /**
+   * @typedef {string}
+   */
+  #id;
+
+  /**
+   * @typedef {boolean}
+   */
+  #hidden;
+  /**
+   * @typedef {string}
+   */
+  #description;
+
+  /**
+   * @typedef {Object} CommandInput
+   * @property {any} args
+   * @property {CommandContext} context
+   *
+   * @typedef {string | import("../components/Console").ConsoleCommand} CommandOutput
+   * @typedef {(input: CommandInput) => CommandOutput} CommandFn
+   * @type {CommandFn}
+   */
+  #fn;
+
+  /**
+   * @typedef {Object} CommandOptions
+   * @property {string} id
+   * @property {string} description
+   * @property {boolean?} hidden
+   *
+   * @param {CommandOptions} opts
+   * @param {CommandFn} fn
+   */
+  constructor(opts, fn) {
+    this.#id = opts.id;
+    this.#description = String(opts.description);
+    this.#hidden = Boolean(opts.hidden);
+    this.#fn = fn;
+  }
+
+  get id() {
+    return this.#id;
+  }
+
+  get hidden() {
+    return this.#hidden;
+  }
+
+  get description() {
+    return this.#description;
+  }
+
+  /**
+   * @param {InternalCommandRunner} runner
+   * @param {CommandInput} input
+   * @return {CommandOutput}
+   */
+  execute(runner, input) {
+    return this.#fn.apply({
+      execute: runner.execute.bind(runner)
+    }, [input]);
+  }
+}
+
+class HelpCommand extends InternalCommand {
+  constructor(otherCommands) {
+    const lines = otherCommands
+      .filter(({ hidden }) => !hidden)
+      .map(({ id, description }) => `:${id} ${description}`)
+      .join('\n');
+    const result = {
+      html: true,
+      value: `${lines}
+copy(<value>) and $_ for last value
+
+${credits}
+`
+    };
+    super({ id: 'help', hidden: true }, () => result);
+  }
+}
+
+const defaultCommands = [
+  new InternalCommand({ id: 'welcome', hidden: true }, () => ({
     value: `Use <strong>:help</strong> to show jsconsole commands
   version: ${version}`,
     html: true,
-  });
+  })),
 
-  help = () => ({
-    value: `:listen [id] - starts remote debugging session
-:theme dark|light
-:load &lt;script_url&gt; load also supports shortcuts to the default file of any npm package, like \`:load jquery\`
-:clear
-:history
-:about
-:version
-copy(<value>) and $_ for last value
-
-${this.about().value}`,
+  new InternalCommand({ id: 'about', description: '' }, () => ({
+    value: credits,
     html: true,
-  });
+  })),
 
-  about = () => ({
-    value:
-      'Built by <a href="https://twitter.com/rem" target="_blank">@rem</a> • <a href="https://github.com/remy/jsconsole" target="_blank">open source</a> • <a href="https://www.paypal.me/rem/9.99usd" target="_blank">donate</a>',
-    html: true,
-  });
-
-  load = async ({ args: urls, console, app }) => {
+  new InternalCommand({ id: 'load', description: '&lt;script_url&gt; load also supports shortcuts to the default file of any npm package, like `:load jquery`' }, async ({ args: urls, context: { console, app } }) => {
     const document = app.inst.getContainer().contentDocument;
     urls.forEach(url => {
       if (url === 'datefns') url = 'date-fns'; // Backwards compatibility
@@ -49,9 +116,9 @@ ${this.about().value}`,
       document.body.appendChild(script);
     });
     return 'Loading script…';
-  };
-
-  set = async ({ args: [key, value], app }) => {
+  }),
+  
+  new InternalCommand({ id: 'set', hidden: true }, async ({ args: [key, value], context: { app } }) => {
     switch (key) {
       case 'theme':
         if (['light', 'dark'].includes(value)) {
@@ -65,18 +132,18 @@ ${this.about().value}`,
         break;
       default:
     }
-  };
+  }),
 
-  theme = async ({ args: [theme], app }) => {
+  new InternalCommand({ id: 'theme', description: 'dark|light' }, async ({ args: [theme], context: { app } }) => {
     if (['light', 'dark'].includes(theme)) {
       app.props.setTheme(theme);
       return;
     }
-  
-    return 'Try ":theme dark" or ":theme light"';
-  };
 
-  history = async ({ app, args: [n = null] }) => {
+    return 'Try ":theme dark" or ":theme light"';
+  }),
+
+  new InternalCommand({ id: 'history', description: '' }, async ({ context: { app }, args: [n = null] }) => {
     const history = app.context.store.getState().history;
     if (n === null) {
       return history.map((item, i) => `${i}: ${item.trim()}`).join('\n');
@@ -89,13 +156,13 @@ ${this.about().value}`,
     }
   
     return;
-  };
-
-  clear = ({ console }) => {
+  }),
+  
+  new InternalCommand({ id: 'clear', description: '' }, ({ console }) => {
     console.clear();
-  };
-
-  listen = async ({ args: [id], console: internalConsole }) => {
+  }),
+  
+  new InternalCommand({ id: 'listen', description: '[id] - starts remote debugging session' }, async ({ args: [id], context: { console: internalConsole } }) => {
     // create new eventsocket
     const res = await fetch(`${API}/remote/${id || ''}`);
     id = await res.json();
@@ -139,7 +206,68 @@ ${this.about().value}`,
         internalConsole.log('Remote connection closed');
       };
     });
-  };
+  }),
 
-  version = () => version;
+  new InternalCommand({ id: 'version', description: '' }, () => version)
+];
+
+export class InternalCommandRunner {
+  #context;
+  /**
+   * @type {Record<string, InternalCommand>}
+   */
+  #cmds;
+
+  /**
+   * @typedef {Object} CommandContext
+   * @property {import("../components/App")} app
+   * @property {import("../components/Console")} console
+   *
+   * @typedef {Object} InternalCommandRunnerOptions
+   * @property {InternalCommand[]} extraCommands
+   * @property {CommandContext} context
+   *
+   * @param {InternalCommandRunnerOptions} ctx
+   */
+  constructor({ context, extraCommands = [] }) {
+    this.#context = {
+      app: context.app,
+      console: context.console
+    };
+    this.#cmds = {};
+    const allCommands = [...extraCommands, ...defaultCommands];
+    allCommands.forEach(cmd => {
+      this.#cmds[cmd.id] = cmd;
+    });
+    const helpCommand = new HelpCommand(allCommands);
+    this.#cmds[helpCommand.id] = helpCommand;
+  }
+
+  get context() {
+    return { ...this.#context };
+  }
+
+  /**
+   * @param {string} cmdName
+   * @param {Array<string>} args
+   */
+  async execute(cmdName, args) {
+    if (/^\d+$/.test(cmdName)) {
+      args = [parseInt(cmdName, 10)];
+      cmdName = 'history';
+    }
+
+    const cmd = this.#cmds[cmdName];
+    if (! cmd) {
+      throw new Error(`No such jsconsole command "${cmdName}"`);
+    }
+
+    let res = await cmd.execute(this, { args, context: this.context });
+
+    if (typeof res === 'string') {
+      res = { value: res };
+    }
+
+    return res;
+  }
 }

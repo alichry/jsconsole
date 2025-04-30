@@ -65,6 +65,9 @@ function interpolate(...args) {
   return { html, args };
 }
 
+/**
+ * @typedef {Object} ConsoleCommand
+ */
 class Console extends Component {
   constructor(props) {
     super(props);

@@ -8,7 +8,7 @@ const nativeConsole = window.console;
 const nativeConsoleProps = { ...nativeConsole };
 export const nativeConsoleProxy = new Proxy({}, {
   get(target, prop, receiver) {
-    if (typeof nativeConsoleProps[prop] === "function") {
+    if (typeof nativeConsoleProps[prop] === 'function') {
       return nativeConsoleProps[prop].bind(nativeConsole);
     }
     return nativeConsoleProps[prop];
