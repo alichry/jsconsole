@@ -88,7 +88,11 @@ class App extends Component {
   render() {
     const { theme, layout } = this.props;
 
-    const className = classnames(['App', theme ? `theme-${theme}` : undefined, layout]);
+    const className = classnames([
+      'App',
+      theme ? `theme-${theme}` : undefined, layout,
+      this.props.className
+    ]);
 
     return (
       <div
@@ -115,6 +119,7 @@ class App extends Component {
 }
 
 App.propTypes = {
+  className: PropTypes.string,
   environment: PropTypes.oneOf(['iframe', 'top-level']),
   extraCommands: PropTypes.arrayOf(function(propValue, key, componentName, location, propFullName) {
     const item = propValue[key];
