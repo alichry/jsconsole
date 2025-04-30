@@ -34,9 +34,10 @@ export default App;
 
 ### Options
 
-The `Root` component defines two configurable options:
+The `Root` component defines the below configurable options:
 - `defaultTheme`: Choose between `light` or `dark`. Defaults to `light`
 - `environment`: Specify an execution environment, defaults to `iframe`. Pass `top-level` to avoid execution of JavaScript code inside an iframe.
+- `className`: Specify a CSS class name for the parent container.
 
 #### Dark theme
 
