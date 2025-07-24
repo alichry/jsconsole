@@ -42,7 +42,7 @@ The `Root` component defines the below configurable options:
 #### Dark theme
 
 ```jsx
-<Root theme="dark" />
+<Root defaultTheme="dark" />
 ```
 
 #### Top-level JS execution
