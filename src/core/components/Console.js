@@ -95,9 +95,9 @@ class Console extends Component {
 
   push(command) {
     const next = getNext();
-    this.setState({
-      commands: this.state.commands.concat([[next, command]])
-    });
+    this.setState((state) => ({
+      commands: state.commands.concat([[next, command]])
+    }));
   };
 
   clear = () => {
