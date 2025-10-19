@@ -170,7 +170,7 @@ const defaultCommands = [
     return;
   }),
   
-  new InternalCommand({ id: 'clear', description: '' }, ({ console }) => {
+  new InternalCommand({ id: 'clear', description: '' }, ({ context: { console } }) => {
     console.clear();
   }),
 
