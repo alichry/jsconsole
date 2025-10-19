@@ -24,6 +24,11 @@ export class InternalCommand {
   #description;
 
   /**
+   * @typedef {boolean}
+   */
+  #parseArgs;
+
+  /**
    * @typedef {Object} CommandInput
    * @property {any} args
    * @property {CommandContext} context
@@ -39,6 +44,7 @@ export class InternalCommand {
    * @property {string} id
    * @property {string} description
    * @property {boolean?} hidden
+   * @property {boolean?} parseArgs - default is true
    *
    * @param {CommandOptions} opts
    * @param {CommandFn} fn
@@ -47,6 +53,7 @@ export class InternalCommand {
     this.#id = opts.id;
     this.#description = String(opts.description);
     this.#hidden = Boolean(opts.hidden);
+    this.#parseArgs = opts.parseArgs === undefined ? true : Boolean(opts.parseArgs);
     this.#fn = fn;
   }
 
@@ -60,6 +67,10 @@ export class InternalCommand {
 
   get description() {
     return this.#description;
+  }
+
+  get parseArgs() {
+    return this.#parseArgs;
   }
 
   /**
@@ -148,7 +159,8 @@ const defaultCommands = [
     if (n === null) {
       return history.map((item, i) => `${i}: ${item.trim()}`).join('\n');
     }
-  
+
+    n = parseInt(n, 10);
     // try to re-issue the historical command
     const command = history.find((item, i) => i === n);
     if (command) {
@@ -161,7 +173,7 @@ const defaultCommands = [
   new InternalCommand({ id: 'clear', description: '' }, ({ console }) => {
     console.clear();
   }),
-  
+
   new InternalCommand({ id: 'listen', description: '[id] - starts remote debugging session' }, async ({ args: [id], context: { console: internalConsole } }) => {
     // create new eventsocket
     const res = await fetch(`${API}/remote/${id || ''}`);
@@ -208,6 +220,25 @@ const defaultCommands = [
     });
   }),
 
+  new InternalCommand({
+    id: 'multiline',
+    description: ' ',
+    parseArgs: false
+  }, async ({ args, context: { app, console: internalConsole }}) => {
+    args = '\n' + args;
+    const blocks = args.split(/(?<!\\)\r?\n[\s]*:/);
+    for (let i = 0; i < blocks.length; i++) {
+      let block = blocks[i];
+      if (block.length === 0) {
+        continue;
+      }
+      if (i > 0) {
+        block = ':' + block;
+      }
+      await app.onRun(block);
+    }
+  }),
+
   new InternalCommand({ id: 'version', description: '' }, () => version)
 ];
 
@@ -249,11 +280,11 @@ export class InternalCommandRunner {
 
   /**
    * @param {string} cmdName
-   * @param {Array<string>} args
+   * @param {string | undefined} args
    */
   async execute(cmdName, args) {
     if (/^\d+$/.test(cmdName)) {
-      args = [parseInt(cmdName, 10)];
+      args = cmdName;
       cmdName = 'history';
     }
 
@@ -262,7 +293,11 @@ export class InternalCommandRunner {
       throw new Error(`No such jsconsole command "${cmdName}"`);
     }
 
-    let res = await cmd.execute(this, { args, context: this.context });
+
+    let res = await cmd.execute(this, {
+      args: cmd.parseArgs && args !== undefined ? args.split(' ') : args,
+      context: this.context
+    });
 
     if (typeof res === 'string') {
       res = { value: res };

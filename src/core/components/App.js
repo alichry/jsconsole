@@ -21,6 +21,11 @@ class App extends Component {
     this.triggerFocus = this.triggerFocus.bind(this);
   }
 
+  /**
+   * 
+   * @param {string} command
+   * @returns {Promise<void>}
+   */
   async onRun(command) {
     if (command[0] !== ':') {
       this.console.push({
@@ -37,7 +42,16 @@ class App extends Component {
       return;
     }
 
-    let [cmd, ...args] = command.slice(1).split(' ');
+
+    const edge = command.search(/[\s]/);
+    let cmd, args = undefined;
+    if (edge !== -1) {
+      cmd = command.substring(0, edge).slice(1);
+      args = command.substring(edge + 1).trim();
+    } else {
+      cmd = command.slice(1);
+    }
+
     let res;
     try {
       res = await this.internalCommands.execute(cmd, args);
